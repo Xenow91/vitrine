@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendBtn.addEventListener('click', sendMessage);
 
-    function sendMessage() {
+    async function sendMessage() {
         const text = chatInput.value.trim();
         if (!text) return;
 
@@ -99,11 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage(text, 'user-message', false);
         showTypingIndicator();
 
-        setTimeout(() => {
+        try {
+            const response = await generateAIResponse(text);
             removeTypingIndicator();
-            const response = generateAIResponse(text);
             appendMessage(response, 'assistant-message', true);
-        }, 800 + Math.random() * 1200); 
+        } catch (error) {
+            removeTypingIndicator();
+            console.error("Erreur API:", error);
+            appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment. L'API est peut-être hors ligne.", 'assistant-message', false);
+        }
     }
 
     function appendMessage(text, className, isStreaming = false) {
@@ -174,26 +178,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function generateAIResponse(userMessage) {
-        const lowerMsg = userMessage.toLowerCase();
+    const API_URL = "https://TON_PSEUDO-TON_REPO.hf.space/generate"; // Remplacer par l'URL de votre Space HF
+
+    async function generateAIResponse(userMessage) {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: userMessage })
+        });
         
-        if (lowerMsg.match(/\b(bonjour|salut|hey|hello|coucou)\b/)) {
-            return "Bonjour ! Comme mentionné, je simule l'interface pour le moment, mais bientôt mon propre fichier .pt sera chargé. Que souhaitez-vous savoir sur les projets ?";
-        } 
-        else if (lowerMsg.includes('transformer') || lowerMsg.includes('llm') || lowerMsg.includes('gqa') || lowerMsg.includes('rope')) {
-            return "Concernant le projet Custom Transformer : l'implémentation de **Grouped-Query Attention (GQA)** m'a permis de drastiquement réduire l'empreinte mémoire du KV Cache lors de l'inférence. Le checkpoint .pt contiendra les poids du modèle et l'état de l'optimiseur pour relancer l'inférence localement !";
-        } 
-        else if (lowerMsg.includes('algo') || lowerMsg.includes('c++') || lowerMsg.includes('segment tree') || lowerMsg.includes('graphe')) {
-            return "L'algorithmique avancée est un de mes domaines d'expertise forts. Développer en **C++** permet un contrôle total sur l'allocation mémoire.\n\nJ'ai notamment conçu des implémentations génériques de **Segment Trees** (avec Lazy Propagation) pour des requêtes complexes sur des intervalles en O(log N). La théorie des graphes est aussi très présente dans mes travaux.";
-        } 
-        else if (lowerMsg.includes('projet') || lowerMsg.includes('portfolio') || lowerMsg.includes('voir')) {
-            return "Vous pouvez cliquer sur les cartes de mes projets dans l'onglet **Portfolio** pour ouvrir les articles de recherche correspondants !";
-        } 
-        else if (lowerMsg.includes('merci')) {
-            return "Je vous en prie ! N'hésitez pas si vous avez d'autres questions.";
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
         }
-        else {
-            return "C'est noté. Dès que l'entraînement sera fini et le checkpoint .pt déployé ici, je pourrai vous générer de vraies réponses via le Custom LLM. En attendant, n'hésitez pas à cliquer sur les projets !";
-        }
+        
+        const data = await response.json();
+        return data.response || "Aucune réponse générée.";
     }
 });
