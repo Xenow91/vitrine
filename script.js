@@ -88,9 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendBtn.addEventListener('click', sendMessage);
 
+    let isGenerating = false;
+
     async function sendMessage() {
+        if (isGenerating) return;
+
         const text = chatInput.value.trim();
         if (!text) return;
+
+        isGenerating = true;
+        chatInput.disabled = true; // Empêche la saisie pendant la génération
 
         chatInput.value = '';
         chatInput.style.height = 'auto';
@@ -104,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
             removeTypingIndicator();
             console.error("Erreur API:", error);
             appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment. L'API est peut-être hors ligne.", 'assistant-message');
+        } finally {
+            isGenerating = false;
+            chatInput.disabled = false; // Réactive la saisie
+            setTimeout(() => chatInput.focus(), 10); // Redonne le focus à la zone de texte
         }
     }
 
