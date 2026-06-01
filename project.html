@@ -70,40 +70,10 @@
             
             <article>
                 <header class="article-header">
-                    <h1>Custom Transformer From Scratch</h1>
-                    <div class="tags">
-                        <span class="tag">Deep Learning</span>
-                        <span class="tag">LLM</span>
-                        <span class="tag">PyTorch</span>
-                    </div>
+                    
                 </header>
-                
+            
                 <div class="article-content">
-                    <h2>Méthodologie et Architecture</h2>
-                    <p>Ce projet vise à implémenter un modèle de langage (LLM) de zéro, sans dépendre de bibliothèques haut niveau comme HuggingFace, en se basant uniquement sur PyTorch. L'objectif est de maîtriser les mécanismes internes des Transformers modernes.</p>
-                    
-                    <p>J'ai intégré plusieurs optimisations clés, notamment :</p>
-                    <ul>
-                        <li style="color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 1.5rem;"><strong>Grouped-Query Attention (GQA) :</strong> Pour réduire la taille du cache KV (Key-Value) en mémoire lors de l'inférence.</li>
-                        <li style="color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 1.5rem;"><strong>Rotary Position Embedding (RoPE) :</strong> Pour une meilleure généralisation sur des longueurs de séquence variables par rapport aux encodages positionnels absolus.</li>
-                    </ul>
-
-                    <h2>Structure du Checkpoint</h2>
-                    <p>Au cours de l'entraînement, je sauvegarde régulièrement l'état du modèle et de l'optimiseur dans des fichiers <code>.pt</code>. Voici un aperçu de la structure du dictionnaire sauvegardé :</p>
-                    
-                    <div class="code-block">
-checkpoint = {
-    'model': raw_model.state_dict(),
-    'optimizer': optimizer.state_dict(),
-    'iter_num': iter,
-    'best_val_loss': best_val_loss,
-    'config': config 
-}
-torch.save(checkpoint, checkpoint_path)
-                    </div>
-
-                    <h2>Prochaines Étapes</h2>
-                    <p>Une fois l'entraînement terminé, je prévois de charger les poids directement dans le backend de ce site. Ainsi, la section "Mon Modèle LLM" du portfolio sera directement connectée à ce modèle via une API locale, ce qui permettra de tester l'inférence en temps réel !</p>
                 </div>
             </article>
         </main>
