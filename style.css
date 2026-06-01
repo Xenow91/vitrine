@@ -256,6 +256,14 @@ body {
     font-size: 1.2rem;
 }
 
+.view-header .contact-email {
+    color: #ffffff;
+    font-size: 1.05rem; /* Slightly smaller than the text above */
+    margin-top: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
