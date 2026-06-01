@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const API_URL = "https://TON_PSEUDO-TON_REPO.hf.space/generate"; // Remplacer par l'URL de votre Space HF
+    const API_URL = "https://xenow91-llm-api.hf.space/generate"; // Remplacer par l'URL de votre Space HF
 
     async function generateAIStream(userMessage) {
         const response = await fetch(API_URL, {
