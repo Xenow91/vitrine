@@ -187,6 +187,12 @@ body {
     align-items: center;
     gap: 1.2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar:hover .sidebar-footer {
+    opacity: 1;
 }
 
 .social-link {
@@ -197,8 +203,8 @@ body {
     justify-content: center;
 }
 
-.social-link:hover {
-    color: var(--accent-purple);
+.social-link:hover, .sidebar-footer a:hover {
+    color: var(--accent-purple-light) !important;
     transform: scale(1.1);
     filter: drop-shadow(0 0 8px rgba(225, 0, 255, 0.5));
 }
@@ -348,6 +354,47 @@ body {
 .btn-primary:hover {
     background: var(--accent-purple-light);
     transform: translateY(-2px);
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    padding: 1rem 1.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent-purple-light);
+    color: var(--accent-purple-light);
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    border-color: var(--accent-purple-light);
+    color: var(--accent-purple-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 61, 255, 0.15);
 }
 
 /* --- Chat View --- */
