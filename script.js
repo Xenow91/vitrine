@@ -95,60 +95,37 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.value = '';
         chatInput.style.height = 'auto';
 
-        appendMessage(text, 'user-message', false);
+        appendMessage(text, 'user-message');
         showTypingIndicator();
 
         try {
-            const response = await generateAIResponse(text);
-            removeTypingIndicator();
-            appendMessage(response, 'assistant-message', true);
+            await generateAIStream(text);
         } catch (error) {
             removeTypingIndicator();
             console.error("Erreur API:", error);
-            appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment. L'API est peut-être hors ligne.", 'assistant-message', false);
+            appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment. L'API est peut-être hors ligne.", 'assistant-message');
         }
     }
 
-    function appendMessage(text, className, isStreaming = false) {
+    function appendMessage(text, className) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${className}`;
         
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
         
+        const formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        bubble.innerHTML = formattedText;
+        
         messageDiv.appendChild(bubble);
         chatHistory.appendChild(messageDiv);
         
-        const formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        chatHistory.scrollTo({
+            top: chatHistory.scrollHeight,
+            behavior: 'smooth'
+        });
         
-        if (isStreaming) {
-            const tokens = formattedText.split(/(<[^>]*>|\s+)/).filter(t => t !== '');
-            let currentHTML = "";
-            let i = 0;
-            
-            const interval = setInterval(() => {
-                if (i >= tokens.length) {
-                    clearInterval(interval);
-                    return;
-                }
-                
-                currentHTML += tokens[i];
-                bubble.innerHTML = currentHTML;
-                
-                chatHistory.scrollTo({
-                    top: chatHistory.scrollHeight,
-                    behavior: 'auto'
-                });
-                
-                i++;
-            }, 35); 
-        } else {
-            bubble.innerHTML = formattedText;
-            chatHistory.scrollTo({
-                top: chatHistory.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
+        return bubble; // Retourne la bulle pour pouvoir y ajouter des chunks dynamiquement
     }
 
     function showTypingIndicator() {
@@ -177,9 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const API_URL = "https://xenow91-llm-api.hf.space/generate";
+    const API_URL = "https://TON_PSEUDO-TON_REPO.hf.space/generate"; // Remplacer par l'URL de votre Space HF
 
-    async function generateAIResponse(userMessage) {
+    async function generateAIStream(userMessage) {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -192,7 +169,41 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(`Erreur HTTP: ${response.status}`);
         }
         
-        const data = await response.json();
-        return data.response || "Aucune réponse générée.";
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        
+        let isFirstToken = true;
+        let responseBubble = null;
+        let accumulatedText = "";
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            if (isFirstToken) {
+                removeTypingIndicator(); // Cache le "Typing indicator" dès le premier chunk
+                responseBubble = appendMessage("", 'assistant-message'); // Crée la bulle vide
+                isFirstToken = false;
+            }
+            
+            const chunkText = decoder.decode(value, { stream: true });
+            accumulatedText += chunkText;
+            
+            // Appliquer un formatage basique (pour le markdown/les sauts de ligne)
+            responseBubble.innerHTML = accumulatedText
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                
+            chatHistory.scrollTo({
+                top: chatHistory.scrollHeight,
+                behavior: 'auto'
+            });
+        }
+        
+        // Sécurité au cas où la réponse soit complètement vide
+        if (isFirstToken) {
+            removeTypingIndicator();
+            appendMessage("Aucune réponse générée.", 'assistant-message');
+        }
     }
 });
