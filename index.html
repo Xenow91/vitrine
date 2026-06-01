@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio & Démo IA - R&D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Retractable) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-text">AI.Dev</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-target="portfolio-view">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span class="nav-text">Portfolio</span>
+                </button>
+                <button class="nav-btn" data-target="chat-view">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span class="nav-text">Mon Modèle LLM</span>
+                </button>
+                <button class="nav-btn" data-target="about-view">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span class="nav-text">À propos</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <p class="footer-text">&copy; 2026 AI.Dev<br>R&D</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Portfolio View -->
+            <section id="portfolio-view" class="view active">
+                <header class="view-header">
+                    <h1>Projets de Recherche & R&D</h1>
+                    <p>Intelligence Artificielle, Modèles Fondateurs et Informatique Théorique</p>
+                </header>
+                <div class="projects-grid">
+                    <!-- Project 1: Custom Transformer -->
+                    <div class="project-card-wrapper" data-href="project.html?id=custom-transformer">
+                        <article class="project-card">
+                            <div class="card-glow"></div>
+                            <div class="card-content">
+                                <h2>Custom Transformer From Scratch</h2>
+                                <p>Implémentation d'un modèle de langage (LLM) en partant de zéro. Intégration d'architectures autorégressives avancées avec Grouped-Query Attention (GQA) et Rotary Position Embedding (RoPE) pour optimiser l'inférence et la mémoire.</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Project 2: Advanced Algorithms -->
+                    <div class="project-card-wrapper" data-href="project.html?id=algo-avancee">
+                        <article class="project-card">
+                            <div class="card-glow"></div>
+                            <div class="card-content">
+                                <h2>Algorithmique Avancée & Prog. Compétitive</h2>
+                                <p>Développement de structures de données complexes (Segment Trees, Fenwick Trees) et d'algorithmes de théorie des graphes optimisés en C++. Résolution de problèmes algorithmiques de haut niveau.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat View (LLM Demo) -->
+            <section id="chat-view" class="view">
+                <div class="chat-container">
+                    <div class="chat-history" id="chat-history">
+                        <!-- Initial Assistant Message -->
+                        <div class="message assistant-message">
+                            <div class="message-bubble">
+                                Bonjour ! Mon modèle (basé sur un Transformer From Scratch) est actuellement en cours d'entraînement. Prochainement, cette interface y sera connectée (via le chargement de mon fichier .pt) et c'est lui qui vous répondra directement ! En attendant, je peux simuler quelques réponses.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <div class="input-wrapper">
+                            <textarea id="chat-input" placeholder="Envoyer un message à l'IA..." rows="1"></textarea>
+                            <button id="send-btn" class="send-btn" aria-label="Envoyer">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                        <div class="input-hint">Appuyez sur Entrée pour envoyer, Shift + Entrée pour un retour à la ligne.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About View -->
+            <section id="about-view" class="view">
+                <header class="view-header">
+                    <h1>À propos de moi</h1>
+                    <p>Présentation & Parcours</p>
+                </header>
+                <div class="about-container">
+                    <div class="about-content">
+                        <h2>Chercheur & Développeur en IA</h2>
+                        <p>Passionné par l'informatique théorique et l'Intelligence Artificielle, je me consacre au développement et à l'optimisation d'architectures de modèles de langage (LLMs) et à la résolution de problèmes algorithmiques complexes.</p>
+                        <p>Mon approche se veut toujours rigoureuse, en combinant des mathématiques poussées (théorie des graphes, optimisation) et une implémentation logicielle ultra-performante (C++, PyTorch).</p>
+                        
+                        <div class="about-actions" style="margin-top: 3rem;">
+                            <a href="cv.pdf" class="btn-primary" target="_blank" download>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Télécharger mon CV (PDF)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

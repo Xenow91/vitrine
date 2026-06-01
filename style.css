@@ -1,0 +1,614 @@
+:root {
+    --bg-dark: #05050f;
+    --bg-sidebar: #080814;
+    --bg-card: #0d0d21;
+    --bg-input: #111126;
+    --text-primary: #e6e6ff;
+    --text-secondary: #8b8ba8;
+    --accent-purple: #8b3dff;
+    --accent-purple-glow: rgba(139, 61, 255, 0.4);
+    --accent-purple-light: #b380ff;
+    --border-color: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    /* Creating depth with a subtle grid and layered gradient */
+    background-image: 
+        radial-gradient(circle at 50% 0%, #1a123f 0%, transparent 70%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    background-position: top center, center center, center center;
+}
+
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden; /* prevents scrollbar when main content slides right */
+}
+
+/* --- Sidebar Navigation (Retractable & Breathing) --- */
+.chat-input-area {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(139, 61, 255, 0.1);
+    position: relative;
+    isolation: isolate;
+}
+
+.sidebar {
+    width: 72px; /* Smaller collapsed width */
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid rgba(139, 61, 255, 0.15); /* Soft border for the glow */
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 0;
+    z-index: 20;
+    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    
+    /* Breathing Plasma Glow */
+    animation: plasma-breathe 8s ease-in-out infinite;
+}
+
+@keyframes plasma-breathe {
+    0%, 100% {
+        box-shadow: 
+            5px 15px 35px rgba(139, 61, 255, 0.12),
+            2px -15px 35px rgba(139, 61, 255, 0.12),
+            1px 0px 10px rgba(139, 61, 255, 0.25);
+    }
+    33% {
+        box-shadow: 
+            12px 35px 50px rgba(139, 61, 255, 0.2),
+            4px -25px 40px rgba(139, 61, 255, 0.08),
+            5px 0px 20px rgba(139, 61, 255, 0.35);
+    }
+    66% {
+        box-shadow: 
+            4px 25px 40px rgba(139, 61, 255, 0.08),
+            12px -35px 50px rgba(139, 61, 255, 0.2),
+            5px 0px 20px rgba(139, 61, 255, 0.35);
+    }
+}
+
+.sidebar:hover {
+    width: 220px; /* Smaller expanded width */
+}
+
+.logo {
+    margin-bottom: 3.5rem;
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    height: 32px;
+}
+
+.logo-text {
+    font-size: 1.4rem; /* Smaller font */
+    font-weight: 700;
+    color: var(--text-primary);
+    text-shadow: 0 0 15px var(--accent-purple-glow);
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    margin-left: 0.5rem;
+}
+
+.sidebar:hover .logo-text {
+    opacity: 1;
+}
+
+/* Pseudo element as icon for the logo when retracted */
+.logo::before {
+    content: 'AI';
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent-purple-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(139, 61, 255, 0.15);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    flex: 1;
+    padding: 0 0.75rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    text-align: left;
+    padding: 0.8rem;
+    border-radius: 10px;
+    font-size: 0.95rem; /* Smaller font */
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    position: relative;
+}
+
+.nav-btn svg {
+    flex-shrink: 0;
+    margin-right: 1rem; /* Adjust margin */
+}
+
+.nav-text {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar:hover .nav-text {
+    opacity: 1;
+    transition-delay: 0.1s; /* Slight delay to fade in after expansion starts */
+}
+
+.nav-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.nav-btn.active {
+    color: var(--text-primary);
+    background-color: rgba(139, 61, 255, 0.12);
+}
+
+.sidebar-footer {
+    padding: 1rem 1.25rem;
+    white-space: nowrap;
+}
+
+.footer-text {
+    font-size: 0.75rem; /* Smaller font */
+    color: var(--text-secondary);
+    line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar:hover .footer-text {
+    opacity: 1;
+}
+
+/* --- Main Content --- */
+.main-content {
+    /* 
+       flex: 0 0 calc(100vw - 72px) keeps the main content width completely fixed.
+       When the sidebar expands to 220px, it pushes this block to the right. 
+       This causes the whole block to slide without ANY resizing inside.
+    */
+    flex: 0 0 calc(100vw - 72px);
+    position: relative;
+    overflow-y: auto;
+}
+
+.view {
+    display: none;
+    padding: 4rem 5rem;
+    height: 100%;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Portfolio View --- */
+.view-header {
+    margin-bottom: 4rem;
+}
+
+.view-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--accent-purple-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.view-header p {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+    perspective: 1500px;
+    max-width: 1100px;
+}
+
+.project-card-wrapper {
+    cursor: pointer; /* Cursor on wrapper since it handles click */
+    transform-style: preserve-3d;
+}
+
+.project-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transform-style: preserve-3d;
+    /* Only transition shadow and border in CSS. Transform is handled by JS! */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.project-card-wrapper:hover .project-card {
+    border-color: rgba(139, 61, 255, 0.5);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+}
+
+.project-card-wrapper:hover .card-glow {
+    opacity: 1;
+}
+
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--accent-purple-glow), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.card-content {
+    position: relative;
+    z-index: 1;
+    transform: translateZ(30px);
+}
+
+.project-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.project-card p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+/* --- About View --- */
+.about-container {
+    max-width: 800px;
+}
+.about-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+.about-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--accent-purple);
+    color: #fff;
+    text-decoration: none;
+    padding: 1rem 1.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+    background: var(--accent-purple-light);
+    transform: translateY(-2px);
+}
+
+/* --- Chat View --- */
+#chat-view {
+    padding: 0;
+    display: none;
+    flex-direction: column;
+}
+
+#chat-view.active {
+    display: flex;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.message {
+    display: flex;
+    max-width: 85%;
+    animation: messageIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform-origin: bottom center;
+}
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.user-message {
+    align-self: flex-end;
+}
+
+.assistant-message {
+    align-self: flex-start;
+}
+
+.message-bubble {
+    padding: 1.2rem 1.5rem;
+    border-radius: 18px;
+    line-height: 1.6;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-message .message-bubble {
+    background-color: rgba(139, 61, 255, 0.15);
+    border: 1px solid rgba(139, 61, 255, 0.3);
+    color: var(--text-primary);
+    border-bottom-right-radius: 4px;
+}
+
+.assistant-message .message-bubble {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 0.8rem 1.2rem;
+    align-items: center;
+    height: 48px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Chat Input */
+.chat-input-area {
+    padding: 1rem 2rem 2.5rem 2rem;
+    background: linear-gradient(to top, var(--bg-dark) 70%, transparent);
+}
+
+.input-wrapper {
+    position: relative;
+    background-color: var(--bg-input);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 32px; /* Smooth rounded borders (pill shape) */
+    padding: 0.4rem 0.6rem;
+    display: flex;
+    align-items: flex-end;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    border-color: rgba(225, 0, 255, 0.5); /* Neon purple inner border */
+    box-shadow: 0 0 15px rgba(225, 0, 255, 0.15); /* Simple CSS glow */
+}
+
+#chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+    resize: none;
+    max-height: 200px;
+    outline: none;
+    line-height: 1.5;
+}
+
+#chat-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.send-btn {
+    background: var(--accent-purple);
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make button perfectly round to match pill shape */
+    width: 0;
+    height: 44px;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0.2rem 0;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.send-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.input-wrapper:focus-within .send-btn,
+#chat-input:not(:placeholder-shown) + .send-btn {
+    width: 44px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+    margin: 0.2rem 0.4rem;
+    box-shadow: 0 0 10px rgba(225, 0, 255, 0.3);
+}
+
+.input-wrapper:focus-within .send-btn svg,
+#chat-input:not(:placeholder-shown) + .send-btn svg {
+    opacity: 1;
+}
+
+.send-btn:hover {
+    background: var(--accent-purple-light);
+    box-shadow: 0 0 15px var(--accent-purple-glow);
+}
+
+.send-btn:active {
+    transform: scale(0.9);
+}
+
+.input-hint {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        overflow: visible;
+        animation: none; /* Disable plasma on mobile header */
+        box-shadow: none;
+    }
+    .sidebar:hover {
+        width: 100%;
+    }
+    .logo::before {
+        display: none;
+    }
+    .logo-text {
+        opacity: 1;
+        margin-left: 0;
+    }
+    .nav-menu {
+        flex-direction: row;
+    }
+    .nav-btn {
+        padding: 0.6rem;
+    }
+    .nav-btn svg {
+        margin-right: 0;
+    }
+    .nav-text {
+        display: none;
+    }
+    .sidebar-footer {
+        display: none;
+    }
+    .main-content {
+        flex: 1; /* Reset on mobile */
+    }
+    .view {
+        padding: 2rem 1.5rem;
+    }
+    .view-header h1 {
+        font-size: 2.2rem;
+    }
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    .chat-input-area {
+        padding: 1rem;
+    }
+}

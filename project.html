@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Projet - AI.Dev</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-purple-light);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .back-btn:hover {
+            color: #fff;
+        }
+        .article-header {
+            margin-bottom: 3rem;
+        }
+        .article-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-purple-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .article-content h2 {
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        .article-content p {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .code-block {
+            background-color: #05050f;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+            color: #e6e6ff;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" style="display: block; overflow-y: auto;">
+        <main class="article-container">
+            <a href="index.html" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Retour au Portfolio
+            </a>
+            
+            <article>
+                <header class="article-header">
+                    <h1>Custom Transformer From Scratch</h1>
+                    <div class="tags">
+                        <span class="tag">Deep Learning</span>
+                        <span class="tag">LLM</span>
+                        <span class="tag">PyTorch</span>
+                    </div>
+                </header>
+                
+                <div class="article-content">
+                    <h2>Méthodologie et Architecture</h2>
+                    <p>Ce projet vise à implémenter un modèle de langage (LLM) de zéro, sans dépendre de bibliothèques haut niveau comme HuggingFace, en se basant uniquement sur PyTorch. L'objectif est de maîtriser les mécanismes internes des Transformers modernes.</p>
+                    
+                    <p>J'ai intégré plusieurs optimisations clés, notamment :</p>
+                    <ul>
+                        <li style="color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 1.5rem;"><strong>Grouped-Query Attention (GQA) :</strong> Pour réduire la taille du cache KV (Key-Value) en mémoire lors de l'inférence.</li>
+                        <li style="color: var(--text-secondary); margin-bottom: 0.5rem; margin-left: 1.5rem;"><strong>Rotary Position Embedding (RoPE) :</strong> Pour une meilleure généralisation sur des longueurs de séquence variables par rapport aux encodages positionnels absolus.</li>
+                    </ul>
+
+                    <h2>Structure du Checkpoint</h2>
+                    <p>Au cours de l'entraînement, je sauvegarde régulièrement l'état du modèle et de l'optimiseur dans des fichiers <code>.pt</code>. Voici un aperçu de la structure du dictionnaire sauvegardé :</p>
+                    
+                    <div class="code-block">
+checkpoint = {
+    'model': raw_model.state_dict(),
+    'optimizer': optimizer.state_dict(),
+    'iter_num': iter,
+    'best_val_loss': best_val_loss,
+    'config': config 
+}
+torch.save(checkpoint, checkpoint_path)
+                    </div>
+
+                    <h2>Prochaines Étapes</h2>
+                    <p>Une fois l'entraînement terminé, je prévois de charger les poids directement dans le backend de ce site. Ainsi, la section "Mon Modèle LLM" du portfolio sera directement connectée à ce modèle via une API locale, ce qui permettra de tester l'inférence en temps réel !</p>
+                </div>
+            </article>
+        </main>
+    </div>
+</body>
+</html>
