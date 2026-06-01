@@ -1,4 +1,3 @@
-// WebGL aurora removed by request
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Navigation Logic ---
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- WebGL Soft Aurora removed ---
+    
 
     // --- 3D Card Interactive Logic ---
     const wrappers = document.querySelectorAll('.project-card-wrapper');
@@ -178,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const API_URL = "https://TON_PSEUDO-TON_REPO.hf.space/generate"; // Remplacer par l'URL de votre Space HF
+    const API_URL = "https://xenow91-llm-api.hf.space/generate";
 
     async function generateAIResponse(userMessage) {
         const response = await fetch(API_URL, {
