@@ -1,38 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- THEME TOGGLE LOGIC ---
-    const themeBtn = document.getElementById('theme-toggle');
-    const htmlEl = document.documentElement;
+
+    // --- DESKTOP SIDEBAR COLLAPSE LOGIC ---
+    const desktopToggleBtn = document.getElementById('desktop-sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
     
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    htmlEl.setAttribute('data-theme', savedTheme);
-    
-    themeBtn.addEventListener('click', () => {
-        const currentTheme = htmlEl.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        htmlEl.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
+    if (desktopToggleBtn) {
+        desktopToggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
 
     // --- MOBILE SIDEBAR LOGIC ---
     const openSidebarBtn = document.getElementById('mobile-menu-btn');
-    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-    const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-    function openSidebar() {
+    function openMobileSidebar() {
         sidebar.classList.add('open');
         sidebarOverlay.classList.add('open');
     }
 
-    function closeSidebar() {
+    function closeMobileSidebar() {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('open');
     }
 
-    if (openSidebarBtn) openSidebarBtn.addEventListener('click', openSidebar);
-    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (openSidebarBtn) openSidebarBtn.addEventListener('click', openMobileSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobileSidebar);
 
     // --- NAVIGATION LOGIC ---
     const navBtns = document.querySelectorAll('.nav-btn');
@@ -48,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(targetId).classList.add('active');
             
             if (window.innerWidth <= 768) {
-                closeSidebar();
+                closeMobileSidebar();
             }
             
             if (targetId === 'chat-view') {
@@ -102,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatInput.value = '';
         chatInput.style.height = 'auto';
 
-        // Render user message directly using marked to support markdown
+        // Render user message directly using marked
         appendMessage(text, 'user-message');
         showTypingIndicator();
 
@@ -115,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             isGenerating = false;
             chatInput.disabled = false;
-            // Ne pas forcer le focus sur mobile pour éviter que le clavier apparaisse
             if (window.innerWidth > 768) {
                 setTimeout(() => chatInput.focus(), 10);
             }
@@ -129,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble markdown-body';
         
-        // Render Markdown if text is not empty
         if (text) {
             bubble.innerHTML = marked.parse(text);
             applySyntaxAndMath(bubble);
@@ -173,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applySyntaxAndMath(element) {
-        // Apply Prism Syntax Highlighting
         if (window.Prism) {
             const codeBlocks = element.querySelectorAll('pre code');
             codeBlocks.forEach((block) => {
@@ -181,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        // Apply KaTeX Math Rendering
         if (window.renderMathInElement) {
             renderMathInElement(element, {
                 delimiters: [
@@ -230,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const chunkText = decoder.decode(value, { stream: true });
             accumulatedText += chunkText;
             
-            // Render basic markdown during stream
             responseBubble.innerHTML = marked.parse(accumulatedText);
             
             chatHistory.scrollTo({
@@ -243,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
             removeTypingIndicator();
             appendMessage("Aucune réponse générée.", 'assistant-message');
         } else {
-            // Once stream is complete, apply advanced rendering (Syntax + Math)
             applySyntaxAndMath(responseBubble);
         }
     }
