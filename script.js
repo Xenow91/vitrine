@@ -1,6 +1,40 @@
-
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Navigation Logic ---
+    // --- THEME TOGGLE LOGIC ---
+    const themeBtn = document.getElementById('theme-toggle');
+    const htmlEl = document.documentElement;
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    htmlEl.setAttribute('data-theme', savedTheme);
+    
+    themeBtn.addEventListener('click', () => {
+        const currentTheme = htmlEl.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        htmlEl.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // --- MOBILE SIDEBAR LOGIC ---
+    const openSidebarBtn = document.getElementById('mobile-menu-btn');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('open');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+    }
+
+    if (openSidebarBtn) openSidebarBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // --- NAVIGATION LOGIC ---
     const navBtns = document.querySelectorAll('.nav-btn');
     const views = document.querySelectorAll('.view');
 
@@ -13,72 +47,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetId = btn.getAttribute('data-target');
             document.getElementById(targetId).classList.add('active');
             
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+            
             if (targetId === 'chat-view') {
                 const chatHistory = document.getElementById('chat-history');
                 chatHistory.scrollTop = chatHistory.scrollHeight;
+                setTimeout(() => document.getElementById('chat-input').focus(), 100);
             }
         });
     });
 
-    
-
-    // --- 3D Card Interactive Logic ---
-    const wrappers = document.querySelectorAll('.project-card-wrapper');
-    
-    wrappers.forEach(wrapper => {
-        const card = wrapper.querySelector('.project-card');
-        let isHovered = false;
-
-        wrapper.addEventListener('mouseenter', () => {
-            isHovered = true;
-            card.style.transition = 'none'; 
-        });
-
-        wrapper.addEventListener('mousemove', e => {
-            if(!isHovered) return;
-            const rect = wrapper.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((y - centerY) / centerY) * -12;
-            const rotateY = ((x - centerX) / centerX) * 12;
-            
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
-        });
-        
-        wrapper.addEventListener('mouseleave', () => {
-            isHovered = false;
-            card.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)'; 
-            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-        });
-        
-        wrapper.addEventListener('click', () => {
-            const href = wrapper.getAttribute('data-href');
-            if(href) {
-                window.location.href = href;
-            }
-        });
-    });
-
-    // --- Chatbot Logic ---
+    // --- CHAT LOGIC ---
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const chatHistory = document.getElementById('chat-history');
 
+    // Auto-resize textarea
     chatInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
-        if(this.value === '') {
-            this.style.height = 'auto'; 
+        
+        // Enable/Disable send button
+        if (this.value.trim().length > 0) {
+            sendBtn.disabled = false;
+        } else {
+            sendBtn.disabled = true;
         }
     });
 
+    // Handle Enter to send, Shift+Enter for new line
     chatInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -97,11 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!text) return;
 
         isGenerating = true;
-        chatInput.disabled = true; // Empêche la saisie pendant la génération
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
 
         chatInput.value = '';
         chatInput.style.height = 'auto';
 
+        // Render user message directly using marked to support markdown
         appendMessage(text, 'user-message');
         showTypingIndicator();
 
@@ -110,11 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             removeTypingIndicator();
             console.error("Erreur API:", error);
-            appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment. L'API est peut-être hors ligne.", 'assistant-message');
+            appendMessage("Désolé, impossible de joindre le modèle LLM pour le moment.", 'assistant-message');
         } finally {
             isGenerating = false;
-            chatInput.disabled = false; // Réactive la saisie
-            setTimeout(() => chatInput.focus(), 10); // Redonne le focus à la zone de texte
+            chatInput.disabled = false;
+            // Ne pas forcer le focus sur mobile pour éviter que le clavier apparaisse
+            if (window.innerWidth > 768) {
+                setTimeout(() => chatInput.focus(), 10);
+            }
         }
     }
 
@@ -123,10 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.className = `message ${className}`;
         
         const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
+        bubble.className = 'message-bubble markdown-body';
         
-        const formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        bubble.innerHTML = formattedText;
+        // Render Markdown if text is not empty
+        if (text) {
+            bubble.innerHTML = marked.parse(text);
+            applySyntaxAndMath(bubble);
+        }
         
         messageDiv.appendChild(bubble);
         chatHistory.appendChild(messageDiv);
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             behavior: 'smooth'
         });
         
-        return bubble; // Retourne la bulle pour pouvoir y ajouter des chunks dynamiquement
+        return bubble;
     }
 
     function showTypingIndicator() {
@@ -165,7 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const API_URL = "https://xenow91-llm-api.hf.space/generate"; // Remplacer par l'URL de votre Space HF
+    function applySyntaxAndMath(element) {
+        // Apply Prism Syntax Highlighting
+        if (window.Prism) {
+            const codeBlocks = element.querySelectorAll('pre code');
+            codeBlocks.forEach((block) => {
+                Prism.highlightElement(block);
+            });
+        }
+        
+        // Apply KaTeX Math Rendering
+        if (window.renderMathInElement) {
+            renderMathInElement(element, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        }
+    }
+
+    const API_URL = "https://xenow91-llm-api.hf.space/generate";
 
     async function generateAIStream(userMessage) {
         const response = await fetch(API_URL, {
@@ -192,29 +222,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (done) break;
             
             if (isFirstToken) {
-                removeTypingIndicator(); // Cache le "Typing indicator" dès le premier chunk
-                responseBubble = appendMessage("", 'assistant-message'); // Crée la bulle vide
+                removeTypingIndicator();
+                responseBubble = appendMessage("", 'assistant-message');
                 isFirstToken = false;
             }
             
             const chunkText = decoder.decode(value, { stream: true });
             accumulatedText += chunkText;
             
-            // Appliquer un formatage basique (pour le markdown/les sauts de ligne)
-            responseBubble.innerHTML = accumulatedText
-                .replace(/\n/g, '<br>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                
+            // Render basic markdown during stream
+            responseBubble.innerHTML = marked.parse(accumulatedText);
+            
             chatHistory.scrollTo({
                 top: chatHistory.scrollHeight,
                 behavior: 'auto'
             });
         }
         
-        // Sécurité au cas où la réponse soit complètement vide
         if (isFirstToken) {
             removeTypingIndicator();
             appendMessage("Aucune réponse générée.", 'assistant-message');
+        } else {
+            // Once stream is complete, apply advanced rendering (Syntax + Math)
+            applySyntaxAndMath(responseBubble);
         }
     }
 });
